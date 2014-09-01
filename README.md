@@ -12,3 +12,6 @@ This module is a straight-forward implementation of:
 in the programming language julia.
 
 Initial stage...
+
+The final version calculated the SPWV in parallel using 
+open.blas and fftw.
