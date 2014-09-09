@@ -4,6 +4,6 @@ function hilbert{T<:Number}(σ::AbstractVector{T})
     σₕ=div(σₙ,2);
 		σ=complex(2*σ)
     FFTW.fft!(σ)
-    σ[1]/=0
+    σ[1]=0
     FFTW.ifft!([σ[1:σₕ];zeros(σₕ)])
 end
