@@ -1,6 +1,7 @@
 wignerVille.jl
 ==============
 
+
 An implementation of the Wigner-Ville transform in julia
 ported from c-code. 
 
@@ -12,9 +13,10 @@ This module is a straight-forward implementation of:
 
 in the programming language julia.
 
-Initial stage...
+Initial stage!!!! Non of the subfunctions is working correctly 
+at the moment, as this is work in progress. 
 
-The final version calculates the SPWV in parallel using 
-open.blas and fftw bindings.
+The final version uses open.blas and fftw bindings to calculate 
+the spwd in parallel.
 
 
