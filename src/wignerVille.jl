@@ -42,7 +42,7 @@ function smoothedPseudoWignerVille{T<:Number}(σ::AbstractVector{T},ω::Int,τ::
   Φ=hilbert(σ)	
   σn=length(σ)
   σp=div(σn,τ)
-  Ψ=zeros(Complex,ω,σn)
+  Ψ=zeros(Complex,div(ω,2),σn)
   τₕ=div(τ,2)
   βₕ=div(β,2)
   count=1;
@@ -58,8 +58,8 @@ function smoothedPseudoWignerVille{T<:Number}(σ::AbstractVector{T},ω::Int,τ::
   for ι=β:σn-β-1
 	  for tt=1:βₕ-1
       #=Ψₜ=sum(Θ.*Φ[ι-τₕ-tt:ι+τₕ-1-tt].*conj(Φ[ι-τₕ+tt:ι+τₕ-1+tt]));=#
-      Ψₜ=sum(Base.LinAlg.BLAS.dotc(τ,Θ.*Φ[ι-τₕ+tt:ι+τₕ-1+tt],1,Θ.*Φ[ι-τₕ-tt:ι+τₕ-1-tt],1));
-		  Ψ[ω-tt+1,ι]=Ωₕₓ[tt].*Ψₜ ;
+      Ψₜ=Base.LinAlg.BLAS.dotc(τ,Θ.*Φ[ι-τₕ+tt:ι+τₕ-1+tt],1,Θ.*Φ[ι-τₕ-tt:ι+τₕ-1-tt],1);
+		  Ψ[div(ω,2)-tt+1,ι]=Ωₕₓ[tt].*Ψₜ ;
     end
   end
 	gc_enable()
