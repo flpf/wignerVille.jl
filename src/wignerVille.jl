@@ -46,10 +46,10 @@ function smoothedPseudoWignerVille{T<:Number}(σ::AbstractVector{T},ω::Int,τ::
   Ω=gaussWindow(β,βₕ,Ξ);
   Ωₕ=hilbert(Ω)
   for ι=1+β:σn-β-1
-		for tt=1:βₕ-1
-    	Ψₜ=sum(Θₕ[:].*conj(Θₕ[:]).*Φ[ι-τₕ+tt:ι+τₕ-1+tt].*conj(Φ[ι-τₕ-tt:ι+τₕ-1-tt]));
-			Ψ[ω+1-tt,ι]=Ω[βₕ-tt+1].*Ψₜ ;
-		end
+	  for tt=1:βₕ-1
+      Ψₜ=sum(Θₕ[:].*conj(Θₕ[:]).*Φ[ι-τₕ+tt:ι+τₕ-1+tt].*conj(Φ[ι-τₕ-tt:ι+τₕ-1-tt]));
+		  Ψ[ω+1-tt,ι]=Ω[βₕ-tt+1].*Ψₜ ;
+    end
   end
   FFTW.fft(Ψ,1) 	
 end
