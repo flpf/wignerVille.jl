@@ -1,8 +1,10 @@
 #=module WignerVilleTransform=#
 
 export wignerVille, pseudoWignerVille, smoothedPseusoWignerVille
+
 include("hilbert.jl")
 using Base.LinAlg.BLAS
+using Devectorize
 function wignerVille{T<:Number}(σ::AbstractVector{T},ω::Int,τ::Int)
 #The Wigner-Ville transform without windowing.
 #
@@ -10,12 +12,12 @@ function wignerVille{T<:Number}(σ::AbstractVector{T},ω::Int,τ::Int)
   σn=length(σ)
   σp=div(σn,τ)
   τₕ=div(τ,2)
-  Ψ=zeros(Complex,ω,σn-τₕ)
+  Ψ=zeros(ω,σn-τₕ)
   count=1;
 	gc_disable()
   for ι=1+τₕ:σn-τₕ-1
     #=Ψ[:,count]=[Φ[ι-τₕ:ι+τₕ].*conj(Φ[ι+τₕ:-1:ι-τₕ]); zeros(Complex,ω-τ-1)];=#
-		Ψ[1:τ,count]=Φ[ι-τₕ:ι+τₕ].*conj(Φ[ι+τₕ:-1:ι-τₕ]);
+		Ψ[1:τ,count]=real(Φ[ι-τₕ:ι+τₕ].*conj(Φ[ι+τₕ:-1:ι-τₕ]));
     count+=1;	
   end
 	gc_enable()
@@ -32,10 +34,11 @@ function pseudoWignerVille{T<:Number}(σ::AbstractVector{T},ω::Int,τ::Int,ξ::
   count=1;
   Θ=gaussWindow(τ,τₕ,ξ);
   Θₕ=hilbert(Θ)
+  Θₕₓ=Θₕ[:].*conj(Θₕ[:])
 	gc_disable()
   for ι=1+τₕ:σn-τₕ-1
     #=Ψ[:,count]=[Θₕ[:].*conj(Θₕ[:]).*Φ[ι-τₕ:ι+τₕ-1].*conj(Φ[ι+τₕ-1:-1:ι-τₕ]); zeros(Complex,ω-τ)];=#
-    Ψ[1:τ,count]=Θₕ[:].*conj(Θₕ[:]).*Φ[ι-τₕ:ι+τₕ-1].*conj(Φ[ι+τₕ-1:-1:ι-τₕ]);
+		Ψ[1:τ,count]=Θₕₓ[:].*Φ[ι-τₕ:ι+τₕ-1].*conj(Φ[ι+τₕ-1:-1:ι-τₕ]);
     count+=1;
   end
 	gc_enable()
@@ -59,7 +62,7 @@ function smoothedPseudoWignerVille{T<:Number}(σ::AbstractVector{T},ω::Int,τ::
   Ωₕ=hilbert(Ω)
   Ωₕₓ=Ωₕ[:].*conj(Ωₕ[:])
 	Ψₜ=zero(Complex)
-	gc_disable()
+	#=gc_disable()=#
 	for ι=1:σn-1
 		for tt=1:βₕ-1
       #=[>Ψₜ=sum(Θ.*Φ[ι-τₕ-tt:ι+τₕ-1-tt].*conj(Φ[ι-τₕ+tt:ι+τₕ-1+tt]));<]=#
@@ -67,7 +70,7 @@ function smoothedPseudoWignerVille{T<:Number}(σ::AbstractVector{T},ω::Int,τ::
 			@inbounds Ψ[tt,ι]=Ωₕₓ[tt].*Ψₜ ;
 		end
 	end
-	gc_enable()
+	#=gc_enable()=#
   FFTW.fft(Ψ,1) 	
 end
 
@@ -79,6 +82,7 @@ function gaussWindow{T<:Int}(τ::T,ξ::T,Δ::T,γ=1.0::Float64)
 #gain γ. 
 return γ*exp(-(([1:τ]-floor(ξ))/(Δ)).^2);
 end
-
-
+function multCconj{T<:Complex}(cc::AbstractVector{T})
+  real(cc)*real(cc)+imag(cc)*imag(cc);
+end
 #=end=#
