@@ -20,6 +20,6 @@ The final version uses open.blas and fftw bindings to calculate
 the spwd in parallel.
 
 The image shows the SPWV of a synthetic signal plotted with 
-stevengj/PyPlot.jl. 
+[PyPlot](http://github.com/stevengj/PyPlot.jl). 
 
 ![Alt text](./files/testSignalSPWV.png)
