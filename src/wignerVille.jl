@@ -1,8 +1,10 @@
 #=module WignerVilleTransform=#
-
+#=blas_set_num_threads(4)=#
 export wignerVille, pseudoWignerVille, smoothedPseusoWignerVille
 
+include("windows.jl")
 include("hilbert.jl")
+
 using Base.LinAlg.BLAS
 using Devectorize
 function wignerVille{T<:Number}(σ::AbstractVector{T},ω::Int,τ::Int)
@@ -45,15 +47,16 @@ function pseudoWignerVille{T<:Number}(σ::AbstractVector{T},ω::Int,τ::Int,ξ::
   FFTW.fft(Ψ,1)
 end
 
+
 function smoothedPseudoWignerVille{T<:Number}(σ::AbstractVector{T},ω::Int,τ::Int,ξ::Int,β::Int,Ξ::Int)
 #Smoothed-pseudo-Wigner-Ville transform
   σn=length(σ)
   σp=div(σn,τ)
 	offset=β+τ;
-	σ=[σ[offset:-1:1]; σ ; σ[σn:-1:σn-(offset)]];
+	σ=[zeros(length(σ[offset:-1:1])); σ ; zeros(length(σ[σn:-1:σn-(offset)]))];
   Φ=hilbert(σ)	
 	#=Φ=[Φ[offset:-1:1]; Φ ; Φ[σn:-1:σn-(offset)]]; =#
-  Ψ=zeros(Complex,div(ω,2),σn)
+  Ψ=zeros(Complex,ω,σn)
   τₕ=div(τ,2)
   βₕ=div(β,2)
   count=1;
@@ -64,24 +67,19 @@ function smoothedPseudoWignerVille{T<:Number}(σ::AbstractVector{T},ω::Int,τ::
 	Ψₜ=zero(Complex)
 	#=gc_disable()=#
 	for ι=1:σn-1
-		for tt=1:βₕ-1
+		for tt=1:βₕ
       #=[>Ψₜ=sum(Θ.*Φ[ι-τₕ-tt:ι+τₕ-1-tt].*conj(Φ[ι-τₕ+tt:ι+τₕ-1+tt]));<]=#
-			@inbounds Ψₜ=BLAS.dotc(τ,Θ.*Φ[offset+ι-τₕ+tt:offset+ι+τₕ-1+tt],1,Θ.*Φ[offset+ι-τₕ-tt:offset+ι+τₕ-1-tt],1);
-			@inbounds Ψ[tt,ι]=Ωₕₓ[tt].*Ψₜ ;
+			Ψₜ=BLAS.dotc(τ,Θ.*Φ[offset+ι-τₕ+tt:offset+ι+τₕ-1+tt],1,Θ.*Φ[offset+ι-τₕ-tt:offset+ι+τₕ-1-tt],1);
+			#=for ii=-τₕ:τₕ-1=#
+			 #=Ψₜ+=Θ[τₕ+1+ii].*conj(Φ[offset+ι-ii+tt]).*Φ[offset+ι+ii-tt];=#
+			#=end=#
+			Ψ[ω-tt+1,ι]=Ωₕₓ[tt].*Ψₜ ;
 		end
 	end
 	#=gc_enable()=#
   FFTW.fft(Ψ,1) 	
 end
 
-function gaussWindow{T<:Int}(τ::T,ξ::T,Δ::T,γ=1.0::Float64)
-#This function returns a Gaussian bell 
-#curve Window. 
-#With total length τ, mid-point ξ, 
-#width Δ at ≈ 78 % of the maximum and 
-#gain γ. 
-return γ*exp(-(([1:τ]-floor(ξ))/(Δ)).^2);
-end
 function multCconj{T<:Complex}(cc::AbstractVector{T})
   real(cc)*real(cc)+imag(cc)*imag(cc);
 end

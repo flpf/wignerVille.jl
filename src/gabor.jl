@@ -1,3 +1,5 @@
+include("Windows.jl")
+
 function dgt{T<:Number}(σ::AbstractVector{T},ω::Int,τ::Int)
 	σₙ=length(σ);
 	σ=conv(σ,fliplr(σ));
@@ -10,13 +12,4 @@ function dgt{T<:Number}(σ::AbstractVector{T},ω::Int,τ::Int)
 		 Γ[p+1,r]=Θ[p+1].*σ[r+p];
 	end
 	abs(FFTW.fft(Γ,1))
-end
-
-function gaussWindow{T<:Int}(τ::T,ξ::T,Δ::T,γ=1::T)
-				#This function returns a Gaussian bell 
-				#curve Window. 
-				#With total length τ, mid-point ξ, 
-				#width Δ at ≈ 78 % of the maximum and 
-				#gain γ. 
-				return γ*exp(-(([1:τ]-floor(ξ))/(Δ)).^2);
 end
