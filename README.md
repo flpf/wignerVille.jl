@@ -13,8 +13,8 @@ This module is a straight-forward implementation of:
 
 in the programming language julia.
 
-Initial stage!!!! Non of the subfunctions is working correctly 
-at the moment, as this is work in progress. 
+Initial stage!!!! Non of the subfunctions are working correctly 
+at the moment --> work in progress. 
 
 The final version uses open.blas and fftw bindings to calculate 
 the spwd in parallel.
