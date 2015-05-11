@@ -14,7 +14,7 @@ This module is a straight-forward implementation of:
 in the programming language julia.
 
 Initial stage!!!! The subfunctions are working correctly but are 
-not really optimised and not documented.
+un-optimised. No documentation yet.
 
 The final version uses open.blas and fftw bindings to calculate 
 the spwd in parallel.
