@@ -1,6 +1,6 @@
 #=module WignerVilleTransform=#
 #=blas_set_num_threads(4)=#
-export wignerVille, pseudoWignerVille, smoothedPseusoWignerVille
+export wignerVille, pseudoWignerVille, smoothedPseudoWignerVille
 
 include("windows.jl")
 include("hilbert.jl")
